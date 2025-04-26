@@ -1,7 +1,108 @@
-const Login = () => {
-  return (
-    <div>Login</div>
-  )
-}
+import { useContext } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { login } from "../api/auth";
+import { AuthContext } from "../context/AuthContext";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
-export default Login
+// Zod schema for validation
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+const Login = () => {
+  const { setToken, setUser } = useContext(AuthContext);
+  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  const onSubmit = async (data: LoginFormValues) => {
+    try {
+      const res = await login({ email: data.email, password: data.password });
+      setToken(res.data.token);
+      setUser(res.data.user);
+    } catch (error) {
+      console.error(error);
+      toast.error("Invalid email or password");
+    }finally{
+      toast.success("Login successful!");
+    }
+  };
+
+  return (
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl">Login</CardTitle>
+            <CardDescription>
+              Enter your email below to login to your account
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <div className="flex flex-col gap-6">
+                <div className="grid gap-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="m@example.com"
+                    {...register("email")}
+                  />
+                  {errors.email && (
+                    <p className="text-red-500 text-sm">{errors.email.message}</p>
+                  )}
+                </div>
+                <div className="grid gap-2">
+                  <div className="flex items-center">
+                    <Label htmlFor="password">Password</Label>
+                  </div>
+                  <Input 
+                    id="password" 
+                    type="password" 
+                    {...register("password")}
+                  />
+                  {errors.password && (
+                    <p className="text-red-500 text-sm">{errors.password.message}</p>
+                  )}
+                </div>
+                <Button type="submit" className="w-full">
+                  Login
+                </Button>
+              </div>
+              <div className="mt-4 text-center text-sm">
+                Don&apos;t have an account?{" "}
+                <Link to="/register" className="hover:underline underline-offset-4">
+                  Sign up
+                </Link>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+};
+
+export default Login;

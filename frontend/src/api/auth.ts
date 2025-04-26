@@ -1,4 +1,4 @@
-import { api } from "@/utils/config";
+import api from "@/utils/config";
 
 export const signup = (data: { email: string; password: string; name: string; country: string; }) => {
   return api.post('/signup', data);

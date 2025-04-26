@@ -11,6 +11,10 @@ app.use(cors());
 
 app.use('/api', router);
 
+app.get("/", (req: Request, res: Response) => {
+  res.send("Welcome to the Task Management API");
+});
+
 app.listen(config.port, () => {
   console.log(`Server running on port ${config.port}`);
 });
