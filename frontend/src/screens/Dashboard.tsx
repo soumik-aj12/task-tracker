@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { AuthContext } from "@/context/AuthContext";
-import { Icon, User } from "lucide-react";
+import { User } from "lucide-react";
 const Dashboard = () => {
   const [projects, setProjects] = useState<any[]>([]);
   const fetchProjects = async () => {
